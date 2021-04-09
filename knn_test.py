@@ -24,8 +24,6 @@ y_df = mushrooms_encoded_df['class']  # classes
 X_array = X_df.to_numpy()
 y_array = y_df.to_numpy()
 
-print(len(X_array))
-
 def train_test_split(X, y, test_size=0.2):
     """
     Shuffles the dataset and splits it into training and test sets.
@@ -39,23 +37,21 @@ def train_test_split(X, y, test_size=0.2):
     :return
         a numpy array of train-test splits (X-train, X-test, y-train, y-test)
     """
-    # This is how many rows we want our test set to be
-    len_test = int(test_size * len(X))
     
     # This is how many rows we want our train set to be
-    len_train = int((1-test_size) * len(X))+1
-
-    X_train = np.zeros(shape=())
+    len_train = int((1-test_size) * len(X))
 
     # Merging the class and attribute columns
     data_array = np.concatenate((X, y[:,None]), axis = 1)
-
     # Shuffling the rows in data_array
-    shuffle_data_array = np.random.shuffle(data_array)
-
-    # Split the training set 
-
-
+    np.random.shuffle(data_array)
+    
+    # Slicing the data array such that it fits the return values
+    X_train = data_array[:len_train,:-1]
+    y_train = data_array[:len_train,-1]
+    X_test = data_array[len_train:,:-1] 
+    y_test = data_array[len_train:,-1] 
+    
     return X_train, X_test, y_train, y_test
 
 
