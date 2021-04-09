@@ -135,8 +135,6 @@ def knn(X_train, y_train, X_test, k=5):
         neighbors = getNeighbors(row_test, X_train, k)
         predictions.append(getPrediction(neighbors, classes))
 
-
-    
-    return 0    #y_pred
+    return predictions
 
 y_hat = knn(X_train, y_train, X_test, k=5)
