@@ -63,15 +63,36 @@ def euclideanDistance(row1, row2):
 	return np.linalg.norm(row1-row2)
 
 def getNeighbors(row_test, data_array, k):
+    """
+    Getting the k nearest neighbor of a row in the test set given the training set
+    
+    :param row_test
+        a row in the test set
+    :param data_array
+        all the rows in the training set
+    :param k
+        number of neighbors to use
+    :return
+        list of neighbors
+    """
     distances = []
+    count = 0
     for row_train in data_array:
         # Calculating the euclidean distance between the row in the test set and the row in the train set. 
         dist = euclideanDistance(row_train,row_test)
-        distances.append((row_train, dist))
+        distances.append((count, dist))
+        count += 1
     # Sorting the distances list with respect to the distance in the tuple
     distances.sort(key=lambda tup: tup[1])
 
+    neighbors = []
+    for neighbor in range(k):
+        neighbors.append(distances[neighbor+1][0])
+    return neighbors
+
 def getPrediction():
+    
+
     return 0
 
 
@@ -90,16 +111,14 @@ def knn(X_train, y_train, X_test, k=5):
     :return
         predicted classes
     """
-    ### START CODE HERE ### 
+    answer = np.concatenate((X_train, y_train[:,None]), axis = 1)
 
-    distances = np.zeros(shape=(len(X_train),1))
-
-    # Sort all of the records in the training dataset by their distance to the new data.
     for row_test in X_test:
-        neighbors = getNeighbors(row_test, X_test, k)
+        neighbors = getNeighbors(row_test, X_train, k)
+        prediction = getPrediction(neighbors, answer)
+
 
     
-    ### END CODE HERE ### 
     return 0    #y_pred
 
 y_hat = knn(X_train, y_train, X_test, k=5)
