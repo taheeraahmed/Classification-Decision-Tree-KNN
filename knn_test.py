@@ -73,7 +73,7 @@ def getNeighbors(row_test, data_array, k):
     :param k
         number of neighbors to use
     :return
-        list of neighbors
+        list of neighbors indexes in data_array
     """
     distances = []
     count = 0
@@ -90,10 +90,28 @@ def getNeighbors(row_test, data_array, k):
         neighbors.append(distances[neighbor+1][0])
     return neighbors
 
-def getPrediction():
-    
+def mostFrequent(list):
+    return max(set(list), key = list.count)
 
-    return 0
+def getPrediction(neighbors,classes):
+    """
+    Get the class/prediction of the neighbors and return the class which 
+    belongs to most of the neighbors
+    
+    :param neighbors
+        list of neighbors indexes in data_array
+    :param classes
+        all the rows in the training set
+    :return
+        class for row in test_set
+    """
+    predictions = []
+    for neighbor in neighbors:
+        # Finding row in the data array which is in neighbor 
+        # Take the last column bc this is the class
+        predictions.append(classes[neighbor,-1])
+    most_frequent = mostFrequent(predictions)
+    return mostFrequent(predictions)
 
 
 def knn(X_train, y_train, X_test, k=5):
@@ -111,11 +129,11 @@ def knn(X_train, y_train, X_test, k=5):
     :return
         predicted classes
     """
-    answer = np.concatenate((X_train, y_train[:,None]), axis = 1)
-
+    classes = np.concatenate((X_train, y_train[:,None]), axis = 1)
+    predictions = []
     for row_test in X_test:
         neighbors = getNeighbors(row_test, X_train, k)
-        prediction = getPrediction(neighbors, answer)
+        predictions.append(getPrediction(neighbors, classes))
 
 
     
