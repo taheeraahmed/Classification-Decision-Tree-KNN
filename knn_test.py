@@ -56,3 +56,50 @@ def train_test_split(X, y, test_size=0.2):
 
 
 X_train, X_test, y_train, y_test = train_test_split(X_array, y_array, 0.33)
+
+# Use this section to place any "helper" code for the `knn()` function.
+
+def euclideanDistance(row1, row2):
+	return np.linalg.norm(row1-row2)
+
+def getNeighbors(row_test, data_array, k):
+    distances = np.zeros(shape=(len(data_array),0))
+    print(row_test)
+    for row_train in data_array:
+        print(row_train)
+
+    return 0
+
+def getPrediction():
+    return 0
+
+
+def knn(X_train, y_train, X_test, k=5):
+    """
+    k-nearest neighbors classifier.
+    
+    :param X_train
+        attributes of the groung truth (training set)
+    :param y_train
+        classes of the groung truth (training set)
+    :param X_test
+        attributes of samples to be classified
+    :param k
+        number of neighbors to use
+    :return
+        predicted classes
+    """
+    ### START CODE HERE ### 
+    #data_array = np.concatenate((X_test, y_test[:,None]), axis = 1)
+
+    distances = np.zeros(shape=(len(X_train),1))
+
+    # Sort all of the records in the training dataset by their distance to the new data.
+    for row_test in X_test:
+        neighbors = getNeighbors(row_test, data_array, k)
+
+
+    ### END CODE HERE ### 
+    return 0    #y_pred
+
+y_hat = knn(X_train, y_train, X_test, k=5)
