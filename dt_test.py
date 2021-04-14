@@ -49,10 +49,12 @@ def train_test_split(X, y, test_size=0.2):
     np.random.shuffle(data_array)
     
     # Slicing the data array such that it fits the return values
-    X_train = data_array[:len_train,:-1]
-    y_train = data_array[:len_train,-1]
-    X_test = data_array[len_train:,:-1] 
-    y_test = data_array[len_train:,-1] 
+    # Attribute values
+    X_train = data_array[:len_train,1:-1]
+    X_test = data_array[len_train:,1:-1] 
+    # Class values
+    y_train = data_array[:len_train,0]
+    y_test = data_array[len_train:,0] 
     
     return X_train, X_test, y_train, y_test
 
@@ -173,7 +175,7 @@ def fit(attributes, target_column):
     :return
         trained decision tree (model)
     """
-    data_array = np.concatenate((target_column[:,None],attributes), axis = 1)
+    data_array = np.concatenate((attributes, target_column[:,None]), axis = 1)
     classes = np.unique(y_train, return_counts=True)
     root = Node()
 
@@ -188,14 +190,16 @@ def fit(attributes, target_column):
     unique_attribute = np.unique(X_train[:,])
     n = len(X_train[0]) 
 
-    #Want 
     for i in range(n):
         #Partitioning the data set given a unique attribute value 
         indices = np.argsort(data_array[:, split])
         arr_temp = data_array[indices] 
         subset_dataarray = np.array_split(arr_temp, np.where(np.diff(arr_temp[:,split])!=0)[0]+1)
-        partition = [data_array[i] for i in range(len(data_array)) if data_array[i][split].all() == unique_attribute.any()]
-        data_array = np.delete(data_array, split, axis=1)
+        print(subset_dataarray)
+        
+        child = build_tree(partition, attributes)
+        root.add_child(child)
+
     # Making a dictionary for the unique values of each attribute given columns  X_train
     
     
