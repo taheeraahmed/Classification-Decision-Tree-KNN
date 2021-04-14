@@ -63,11 +63,10 @@ class Node:
     Class to represent a node in the tree which stores a list of children nodes and the data beloning to that node.
     Data is a subset of the whole data_array.
     """
-    def __init__(self, data, attribute):
+    def __init__(self, data='', leaf=False):
         self.data = data
         self.children = []
-        self.attribute = attribute
-
+        self.leaf = leaf
     def isEmpty(self):
         return (self.data is None)
 
@@ -108,53 +107,60 @@ def giniCoefficient(attribute_count):
     return gini
 
 def bestSplit(X_train,y_train):
-        # Number of attributes
-        n = len(X_train[0]) 
-        d = len(X_train)
-        classes = np.unique(y_train)
-        data_array = np.concatenate((X_train, y_train[:,None]), axis = 1)
-        # List of calculated gini splits for all attributes
-        gini_split_value = []
+    # Number of attributes
+    n = len(X_train[0]) 
+    d = len(X_train)
+    classes = np.unique(y_train)
+    data_array = np.concatenate((X_train, y_train[:,None]), axis = 1)
+    # List of calculated gini splits for all attributes
+    gini_split_value = []
+    
+    # Iterate over all attributes to calculate their gsplits
+    i = 2
+    for i in range(n):
+        # Get column of X_train and combine it with class column
+        column_target = np.vstack((X_train[:,i], y_train))
+        unique_attribute = np.unique(X_train[:,i])
         
-        # Iterate over all attributes to calculate their gsplits
-        i = 2
-        for i in range(n):
-                # Get column of X_train and combine it with class column
-                column_target = np.vstack((X_train[:,i], y_train))
-                unique_attribute = np.unique(X_train[:,i])
-                
-                # Get count of each ocurrence given an attribute and y_train
-                # Row = attributes, Columns = count for class T/F
-                unique_attribute_count = np.zeros(shape=(len(unique_attribute),len(classes)))
-                # Shady stuff, if you have time FIX
-                for row in column_target.T:
-                    if (row[1]==1):
-                        unique_attribute_count[row[0],0] +=1
-                    else: 
-                        unique_attribute_count[row[0],1] +=1
+        # Get count of each ocurrence given an attribute and y_train
+        # Row = attributes, Columns = count for class T/F
+        unique_attribute_count = np.zeros(shape=(len(unique_attribute),len(classes)))
+        # Shady stuff, if you have time FIX
+        for row in column_target.T:
+            if (row[1]==1):
+                unique_attribute_count[row[0],0] +=1
+            else: 
+                unique_attribute_count[row[0],1] +=1
 
-                #Calculating the gini values for each unique attribute value
-                gini_unique_attribute = np.zeros(shape=(len(unique_attribute_count),))
-                j = 0
-                for row in unique_attribute_count:
-                    gini_unique_attribute[j] = giniCoefficient(row)
-                    j += 1
+        #Calculating the gini values for each unique attribute value
+        gini_unique_attribute = np.zeros(shape=(len(unique_attribute_count),))
+        j = 0
+        for row in unique_attribute_count:
+            gini_unique_attribute[j] = giniCoefficient(row)
+            j += 1
 
-                # Calculating the split value
-                row_sum = np.sum(unique_attribute_count, axis = 1)
-                # Count numbers of occurences for all attributes
-                tot_sum = np.sum(unique_attribute_count)
-                if (len(gini_unique_attribute)==1):
-                    gini_split_value.append(gini_unique_attribute[0])
+        # Calculating the split value
+        row_sum = np.sum(unique_attribute_count, axis = 1)
+        # Count numbers of occurences for all attributes
+        tot_sum = np.sum(unique_attribute_count)
+        if (len(gini_unique_attribute)==1):
+            gini_split_value.append(gini_unique_attribute[0])
 
-                else:
-                    sum_gini = 0
-                    for x,y in zip(row_sum,gini_unique_attribute):
-                        sum_gini += (y/tot_sum)*x
-                    gini_split_value.append(sum_gini)
-        # Get maximum attribute index
-        min_gini= gini_split_value.index(min(gini_split_value))
-        return min_gini
+        else:
+            sum_gini = 0
+            for x,y in zip(row_sum,gini_unique_attribute):
+                sum_gini += (y/tot_sum)*x
+            gini_split_value.append(sum_gini)
+    # Get maximum attribute index
+    min_gini= gini_split_value.index(min(gini_split_value))
+    return min_gini
+
+def stop_condition(classes_val):
+    counts = classes_val[1]
+    if (counts[0]>1 and counts[1]>1): 
+        return False
+    else:
+        return True
 
 def fit(attributes, target_column):
     """
@@ -168,15 +174,27 @@ def fit(attributes, target_column):
         trained decision tree (model)
     """
     data_array = np.concatenate((target_column[:,None],attributes), axis = 1)
-    root = Node(data=data_array, attribute='Parent')
-    
+    classes = np.unique(y_train, return_counts=True)
+    root = Node()
+
+    if stop_condition(classes):
+	    return root
+
+    if len(data_array) == 0:
+        root.leaf = True
+        return root
+
     split = bestSplit(X_train,y_train)
     unique_attribute = np.unique(X_train[split])
     n = len(X_train[0]) 
+
+    #Want 
     for i in range(n):
-        partition = [data_array[i] for i in range(len(data_array)) if data_array[i][split].all() == unique_attribute.all()]
+        partition = {}
+        for attribute in unique_attribute:  
+            print(attribute)
+        partition = [data_array[i] for i in range(len(data_array)) if data_array[i][split].all() == unique_attribute.any()]
         data_array = np.delete(data_array, split, axis=1)
-    print(split)
     # Making a dictionary for the unique values of each attribute given columns  X_train
     
     
