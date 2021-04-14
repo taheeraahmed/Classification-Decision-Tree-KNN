@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-mushrooms_df = pd.read_csv('mushrooms.csv')
+mushrooms_df = pd.read_csv('data/mushrooms.csv')
 
 mushrooms_df
 
@@ -35,22 +35,24 @@ def train_test_split(X, y, test_size=0.2):
     :param test_size
         float between 0.0 and 1.0 representing the proportion of the dataset to include in the test split
     :return
-        a numpy array of train-test splits (X-train, X-test, y-train, y-test)
+        train-test splits (X-train, X-test, y-train, y-test)
     """
+    
     
     # This is how many rows we want our train set to be
     len_train = int((1-test_size) * len(X))
 
-    # Merging the class and attribute columns
+    # Merging the class and attribute columns, the class column is the last 
     data_array = np.concatenate((X, y[:,None]), axis = 1)
+
     # Shuffling the rows in data_array
     np.random.shuffle(data_array)
     
     # Slicing the data array such that it fits the return values
-    X_train = data_array[:len_train,:-1]
-    y_train = data_array[:len_train,-1]
-    X_test = data_array[len_train:,:-1] 
-    y_test = data_array[len_train:,-1] 
+    X_train = data_array[:,1:]
+    y_train = data_array[:,1:]
+    X_test = data_array[:,-1] 
+    y_test = data_array[:,-1] 
     
     return X_train, X_test, y_train, y_test
 
