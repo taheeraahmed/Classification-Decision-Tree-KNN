@@ -49,10 +49,10 @@ def train_test_split(X, y, test_size=0.2):
     np.random.shuffle(data_array)
     
     # Slicing the data array such that it fits the return values
-    X_train = data_array[:len_train,1:]
-    y_train = data_array[:len_train,1:]
-    X_test = data_array[len_train:,0] 
-    y_test = data_array[len_train:,0] 
+    X_train = data_array[:len_train,:-1]
+    y_train = data_array[:len_train,-1]
+    X_test = data_array[len_train:,:-1] 
+    y_test = data_array[len_train:,-1] 
     
     return X_train, X_test, y_train, y_test
 
@@ -185,15 +185,15 @@ def fit(attributes, target_column):
         return root
 
     split = bestSplit(X_train,y_train)
-    unique_attribute = np.unique(X_train[:,split])
+    unique_attribute = np.unique(X_train[:,])
     n = len(X_train[0]) 
 
     #Want 
     for i in range(n):
-        partition = {}
-        data = data_array[:,split]
-        for attribute in unique_attribute:  
-            print(attribute)
+        #Partitioning the data set given a unique attribute value 
+        indices = np.argsort(data_array[:, split])
+        arr_temp = data_array[indices] 
+        subset_dataarray = np.array_split(arr_temp, np.where(np.diff(arr_temp[:,split])!=0)[0]+1)
         partition = [data_array[i] for i in range(len(data_array)) if data_array[i][split].all() == unique_attribute.any()]
         data_array = np.delete(data_array, split, axis=1)
     # Making a dictionary for the unique values of each attribute given columns  X_train
