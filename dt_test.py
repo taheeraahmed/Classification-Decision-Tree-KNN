@@ -65,10 +65,10 @@ class Node:
     Class to represent a node in the tree which stores a list of children nodes and the data beloning to that node.
     Data is a subset of the whole data_array.
     """
-    def __init__(self, data='', leaf=False):
+    def __init__(self, data=''):
         self.data = data
         self.children = []
-        self.leaf = leaf
+
     def isEmpty(self):
         return (self.data is None)
 
@@ -77,13 +77,6 @@ class Node:
     
     def getData(self):
         return self.data
-    
-    def setAttrbute(self, attribute):
-        self.attribute = attribute
-    
-    def getAttribute(self, attribute):
-        return self.attribute
-
 
     def addChild(self, child):
         self.children.append(child)
@@ -118,9 +111,9 @@ def bestSplit(X_train,y_train):
     gini_split_value = []
     
     # Iterate over all attributes to calculate their gsplits
-    i = 2
+    #i = 2
     for i in range(n):
-        # Get column of X_train and combine it with class column
+        # Get i-th column of X_train and combine it with class column
         column_target = np.vstack((X_train[:,i], y_train))
         unique_attribute = np.unique(X_train[:,i])
         
@@ -159,10 +152,11 @@ def bestSplit(X_train,y_train):
 
 def stopCondition(classes_val):
     counts = classes_val[1]
-    if (counts[0]>1 and counts[1]>1): 
-        return False
-    else:
+    len_counts = len(counts)
+    if (len_counts==1): 
         return True
+    else:
+        return False
 
 def partitionDataset(data, split):
     indices = np.argsort(data[:, split])
@@ -187,22 +181,25 @@ def fit(X_train, y_train):
     """
     attributes = len(X_train[0])
     data_array = np.concatenate((X_train, y_train[:,None]), axis = 1)
-    classes = np.unique(y_train, return_counts=True)
+    classes_count = np.unique(y_train, return_counts=True)
     root = Node()
 
-    if stopCondition(classes):
-	    return root
+    # If all values of y_train is equal
+    if stopCondition(classes_count) == True:
+            for i in classes_count:
+                # Also pretty shady, if there is time, fix
+                if(i==0 or i==1):
+                        root.setData(i)
+                        return root
 
     # If there are no more attributes, but still more data in the array 
     # You must return the majority value of the classes 
     if attributes == 0:
-        
+        majority_value = np.argmax(classes_count[1])
+        root.set_data(majority_value)
         return root
 
     split = bestSplit(X_train,y_train)
-    # Removing the best split attribute from attributes
-    # 
-    # unique_attribute = np.unique(X_train[:,])
     attributes = attributes - 1
 
     for i in range(attributes):
@@ -213,7 +210,7 @@ def fit(X_train, y_train):
             y_subset.append(sub[:,-1])
         for i in range(len(X_subset)):
             child = fit(X_subset[i],y_subset[i])
-            root.add_child(child)
+            root.addChild(child)
 
     # Making a dictionary for the unique values of each attribute given columns  X_train
     
@@ -221,9 +218,6 @@ def fit(X_train, y_train):
     # Use Hunt's algorithm
     
     # Find the best split
-
-
-    
-    return 0
+    return root
 
 model = fit(X_train, y_train)
