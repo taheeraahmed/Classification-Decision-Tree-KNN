@@ -132,14 +132,6 @@ def bestSplit(X_train,y_train):
                 index_attr = np.where(unique_attribute == a)[0]
                 unique_attribute_count[index_attr,1] += 1
 
-        # for row in column_target.T:
-        #     if (row[1]==1):
-        #         unique_attribute_count[row[i],0] +=1
-        #         i += 1
-        #     else: 
-        #         unique_attribute_count[row[i],1] +=1
-        #         i += 1
-
         #Calculating the gini values for each unique attribute value
         gini_unique_attribute = np.zeros(shape=(len(unique_attribute_count),))
         j = 0
