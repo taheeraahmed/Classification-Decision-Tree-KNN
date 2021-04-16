@@ -114,18 +114,31 @@ def bestSplit(X_train,y_train):
     #i = 2
     for i in range(n):
         # Get i-th column of X_train and combine it with class column
-        column_target = np.vstack((X_train[:,i], y_train))
+        #column_target = np.vstack((X_train[:,i], y_train))
         unique_attribute = np.unique(X_train[:,i])
         
         # Get count of each ocurrence given an attribute and y_train
         # Row = attributes, Columns = count for class T/F
         unique_attribute_count = np.zeros(shape=(len(unique_attribute),len(classes)))
-        # Shady stuff, if you have time FIX
-        for row in column_target.T:
-            if (row[1]==1):
-                unique_attribute_count[row[0],0] +=1
-            else: 
-                unique_attribute_count[row[0],1] +=1
+        # Shady stuff, if you have time FIX DERSOM ATTRIBUTES IKKE ER 0,1,2,3,4,5 BLIR DETTE FEIL
+        # F.EKS 0,2,5
+        i=0
+        for a, c in zip(X_train[:,i],y_train):
+            #print(a,c)
+            if c == 1:
+                index_attr = np.where(unique_attribute == a)[0]
+                unique_attribute_count[index_attr,0] += 1
+            else:
+                index_attr = np.where(unique_attribute == a)[0]
+                unique_attribute_count[index_attr,1] += 1
+
+        # for row in column_target.T:
+        #     if (row[1]==1):
+        #         unique_attribute_count[row[i],0] +=1
+        #         i += 1
+        #     else: 
+        #         unique_attribute_count[row[i],1] +=1
+        #         i += 1
 
         #Calculating the gini values for each unique attribute value
         gini_unique_attribute = np.zeros(shape=(len(unique_attribute_count),))
@@ -163,8 +176,8 @@ def partitionDataset(data, split):
     arr_temp = data[indices] 
     subset_dataarray = np.array_split(arr_temp, np.where(np.diff(arr_temp[:,split])!=0)[0]+1)
     # Removing split column from subset_data
-    for subset in subset_dataarray:
-        subset = np.delete(subset, split, axis=1)
+    # for subset in subset_dataarray:
+        #subset = np.delete(subset, split, axis=1)
     return subset_dataarray
 
 
@@ -200,7 +213,8 @@ def fit(X_train, y_train):
         return root
 
     split = bestSplit(X_train,y_train)
-    attributes = attributes - 1
+    data_array=np.delete(data_array, split, axis=1)
+    attributes = len(data_array[0]-1)
 
     for i in range(attributes):
         #Partitioning the data set given a unique attribute value 
@@ -212,12 +226,6 @@ def fit(X_train, y_train):
             child = fit(X_subset[i],y_subset[i])
             root.addChild(child)
 
-    # Making a dictionary for the unique values of each attribute given columns  X_train
-    
-    
-    # Use Hunt's algorithm
-    
-    # Find the best split
     return root
 
 model = fit(X_train, y_train)
