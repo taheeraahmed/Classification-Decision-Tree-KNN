@@ -168,28 +168,26 @@ def partitionDataset(data, split):
     arr_temp = data[indices] 
     subset_dataarray = np.array_split(arr_temp, np.where(np.diff(arr_temp[:,split])!=0)[0]+1)
     # Removing split column from subset_data
-    # for subset in subset_dataarray:
-        #subset = np.delete(subset, split, axis=1)
     return subset_dataarray
 
 
-def fit(X_train, y_train):
+def fit(attribute_values, labels):
     """
     Function implementing decision tree induction.
     
-    :param X_train
+    :param attribute_values
         list of attribute values
-    :param y_train
+    :param labels
         target column aka the class
     :return
         trained decision tree (model)
     """
-    attributes = len(X_train[0])
-    data_array = np.concatenate((X_train, y_train[:,None]), axis = 1)
-    classes_count = np.unique(y_train, return_counts=True)
+    attributes = np.arange(len(attribute_values[0])).tolist()
+    data_array = np.concatenate((attribute_values, labels[:,None]), axis = 1)
+    classes_count = np.unique(labels, return_counts=True)
     root = Node()
 
-    # If all values of y_train is equal
+    # If all values of labels is equal
     if stopCondition(classes_count) == True:
             for i in classes_count:
                 # Also pretty shady, if there is time, fix
@@ -199,23 +197,25 @@ def fit(X_train, y_train):
 
     # If there are no more attributes, but still more data in the array 
     # You must return the majority value of the classes 
-    if attributes == 0:
+    if len(attributes) == 0:
         majority_value = np.argmax(classes_count[1])
         root.set_data(majority_value)
         return root
 
-    split = bestSplit(X_train,y_train)
-    data_array=np.delete(data_array, split, axis=1)
-    attributes = len(data_array[0]-1)
+    split = bestSplit(attribute_values,labels)
 
-    for i in range(attributes):
+    # Removing the split value from the arrays
+    attributes.pop(split)
+    data_array=np.delete(data_array, split, axis=1)
+
+    for i in range(len(attributes)):
         #Partitioning the data set given a unique attribute value 
         X_subset = partitionDataset(data_array,split)
         y_subset = []
         for sub in X_subset:
             y_subset.append(sub[:,-1])
-        for i in range(len(X_subset)):
-            child = fit(X_subset[i],y_subset[i])
+        for j in range(len(X_subset)):
+            child = fit(X_subset[j],y_subset[j])
             root.addChild(child)
 
     return root
