@@ -211,11 +211,10 @@ def fit(attribute_values, labels):
 
     # Removing the split value from the arrays
     attributes.pop(split)
-    #data_array=np.delete(data_array, 2, axis=1)
 
     for i in range(len(attributes)):
         #Partitioning the data set given a unique attribute value 
-        X_subset = partitionDataset(data_array,3)
+        X_subset = partitionDataset(data_array,split)
         y_subset = []
         for sub in X_subset:
             y_subset.append(sub[:,-1])
