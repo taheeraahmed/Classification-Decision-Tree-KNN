@@ -164,7 +164,13 @@ def stopCondition(classes_val):
         return False
 
 def partitionDataset(data, split):
-    indices = np.argsort(data[:, split])
+    test = data[:,2]
+    unique_values_column = np.unique(data[:,2],axis=0)
+    temp = []
+    for unique_value in unique_values_column:
+        temp.append(np.where(data[:,2]==unique_value))
+
+    #temp = np.asarray(temp)
     arr_temp = data[indices] 
     subset_dataarray = np.array_split(arr_temp, np.where(np.diff(arr_temp[:,split])!=0)[0]+1)
     # Removing split column from subset_data
@@ -186,7 +192,6 @@ def fit(attribute_values, labels):
     data_array = np.concatenate((attribute_values, labels[:,None]), axis = 1)
     classes_count = np.unique(labels, return_counts=True)
     root = Node()
-
     # If all values of labels is equal
     if stopCondition(classes_count) == True:
             for i in classes_count:
@@ -206,11 +211,11 @@ def fit(attribute_values, labels):
 
     # Removing the split value from the arrays
     attributes.pop(split)
-    data_array=np.delete(data_array, split, axis=1)
+    #data_array=np.delete(data_array, 2, axis=1)
 
     for i in range(len(attributes)):
         #Partitioning the data set given a unique attribute value 
-        X_subset = partitionDataset(data_array,split)
+        X_subset = partitionDataset(data_array,3)
         y_subset = []
         for sub in X_subset:
             y_subset.append(sub[:,-1])
