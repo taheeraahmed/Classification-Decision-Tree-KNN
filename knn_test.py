@@ -140,3 +140,24 @@ def knn(X_train, y_train, X_test, k=5):
     return predictions
 
 y_hat = knn(X_train, y_train, X_test, k=5)
+
+def evaluate(y_true, y_pred):
+    """
+    Function calculating the accuracy of the model on the given data.
+    
+    :param y_true
+        true classes
+    :paaram y
+        predicted classes
+    :return
+        accuracy
+    """
+    ### START CODE HERE ### 
+    result = []
+    for classes in y_true:
+        print(classes)
+    ### END CODE HERE ### 
+    return accuracy
+
+accuracy = evaluate(y_test, y_hat)
+print('accuracy =', accuracy)
